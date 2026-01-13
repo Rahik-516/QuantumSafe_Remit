@@ -116,76 +116,76 @@ export default function Dashboard() {
         return <FiTarget className={iconClass} />;
     }
   };
-
+  //LoadAlocation history- added
   const calculateAndUpdateImpactScore = useCallback(async (userId: string) => {
-    try {
-      // Fetch all remittances for this user
-      const { data, error } = await supabase
-        .from('remittance_history')
-        .select('*')
-        .eq('user_id', userId)
-        .limit(100);
+  try {
+    const { data, error } = await supabase
+      .from('remittance_history')
+      .select('*')
+      .eq('user_id', userId)
+      .limit(100);
 
-      if (error) {
-        console.error('Error loading remittances for impact score:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const remittanceCount = data.length;
-        const allocatedAmounts = data.filter((r: any) => r.amount > 0).map((r: any) => r.amount);
-        const avgAllocation = allocatedAmounts.length > 0
-          ? Math.round((allocatedAmounts.reduce((a: number, b: number) => a + b, 0) / allocatedAmounts.length / 10000) * 100)
-          : 0;
-
-        const score = calculateImpactScore(remittanceCount, Math.min(avgAllocation, 30));
-        setImpactScore(score);
-        setAvgAllocationPercent(Math.min(avgAllocation, 30));
-      }
-    } catch (err) {
-      console.error('Impact score calculation error:', err);
+    if (error) {
+      console.error('Error loading remittances for impact score:', error);
+      return;
     }
-  }, []);
 
-  const loadAllocationHistory = useCallback(async (userId: string) => {
-    try {
-      setLoadingAllocationHistory(true);
-      const { data, error } = await supabase
-        .from('remittance_history')
-        .select('*')
-        .eq('user_id', userId)
-        .filter('recipient', 'like', 'vault:%')
-        .order('created_at', { ascending: false })
-        .limit(10);
+    if (data && data.length > 0) {
+      const remittanceCount = data.length;
+      const allocatedAmounts = data.filter((r: any) => r.amount > 0).map((r: any) => r.amount);
+      const avgAllocation = allocatedAmounts.length > 0
+        ? Math.round((allocatedAmounts.reduce((a: number, b: number) => a + b, 0) / allocatedAmounts.length / 10000) * 100)
+        : 0;
 
-      if (error) {
-        console.error('Error loading allocation history:', error);
-        setAllocationHistory([]);
-        return;
-      }
+      const score = calculateImpactScore(remittanceCount, Math.min(avgAllocation, 30));
+      setImpactScore(score);
+      setAvgAllocationPercent(Math.min(avgAllocation, 30));
+    }
+  } catch (err) {
+    console.error('Impact score calculation error:', err);
+  }
+}, []);
 
-      if (data) {
-        const records: AllocationRecord[] = data.map((item: any) => ({
-          id: item.id,
-          vault_type: item.recipient.replace('vault:', ''),
-          amount: item.amount || 0,
-          allocation_percent: item.amount ? Math.floor(Math.random() * 30) : 0,
-          impact_text: `Allocated to ${item.recipient.replace('vault:', '')} vault`,
-          created_at: item.created_at,
-          project_name: getMockProjectName(item.recipient.replace('vault:', '')),
-        }));
-        setAllocationHistory(records);
-      }
-    } catch (err) {
-      console.error('Allocation history load error:', err);
+// Wrap loadAllocationHistory with useCallback
+const loadAllocationHistory = useCallback(async (userId: string) => {
+  try {
+    setLoadingAllocationHistory(true);
+    const { data, error } = await supabase
+      .from('remittance_history')
+      .select('*')
+      .eq('user_id', userId)
+      .filter('recipient', 'like', 'vault:%')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Error loading allocation history:', error);
       setAllocationHistory([]);
-    } finally {
-      setLoadingAllocationHistory(false);
+      return;
     }
 
-    // Calculate impact score
-    calculateAndUpdateImpactScore(userId);
-  }, [calculateAndUpdateImpactScore]);
+    if (data) {
+      const records: AllocationRecord[] = data.map((item: any) => ({
+        id: item.id,
+        vault_type: item.recipient.replace('vault:', ''),
+        amount: item.amount || 0,
+        allocation_percent: item.amount ? Math.floor(Math.random() * 30) : 0,
+        impact_text: `Allocated to ${item.recipient.replace('vault:', '')} vault`,
+        created_at: item.created_at,
+        project_name: getMockProjectName(item.recipient.replace('vault:', '')),
+      }));
+      setAllocationHistory(records);
+    }
+  } catch (err) {
+    console.error('Allocation history load error:', err);
+    setAllocationHistory([]);
+  } finally {
+    setLoadingAllocationHistory(false);
+  }
+
+  // Calculate impact score
+  calculateAndUpdateImpactScore(userId);
+}, [calculateAndUpdateImpactScore]); // Add dependency here
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -269,6 +269,76 @@ export default function Dashboard() {
     } catch (err) {
       console.error('Vaults load error:', err);
       setVaults([]);
+    }
+  };
+
+  const loadAllocationHistory = async (userId: string) => {
+    try {
+      setLoadingAllocationHistory(true);
+      const { data, error } = await supabase
+        .from('remittance_history')
+        .select('*')
+        .eq('user_id', userId)
+        .filter('recipient', 'like', 'vault:%')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error loading allocation history:', error);
+        setAllocationHistory([]);
+        return;
+      }
+
+      if (data) {
+        const records: AllocationRecord[] = data.map((item: any) => ({
+          id: item.id,
+          vault_type: item.recipient.replace('vault:', ''),
+          amount: item.amount || 0,
+          allocation_percent: item.amount ? Math.floor(Math.random() * 30) : 0,
+          impact_text: `Allocated to ${item.recipient.replace('vault:', '')} vault`,
+          created_at: item.created_at,
+          project_name: getMockProjectName(item.recipient.replace('vault:', '')),
+        }));
+        setAllocationHistory(records);
+      }
+    } catch (err) {
+      console.error('Allocation history load error:', err);
+      setAllocationHistory([]);
+    } finally {
+      setLoadingAllocationHistory(false);
+    }
+
+    // Calculate impact score
+    calculateAndUpdateImpactScore(userId);
+  };
+
+  const calculateAndUpdateImpactScore = async (userId: string) => {
+    try {
+      // Fetch all remittances for this user
+      const { data, error } = await supabase
+        .from('remittance_history')
+        .select('*')
+        .eq('user_id', userId)
+        .limit(100);
+
+      if (error) {
+        console.error('Error loading remittances for impact score:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const remittanceCount = data.length;
+        const allocatedAmounts = data.filter((r: any) => r.amount > 0).map((r: any) => r.amount);
+        const avgAllocation = allocatedAmounts.length > 0
+          ? Math.round((allocatedAmounts.reduce((a: number, b: number) => a + b, 0) / allocatedAmounts.length / 10000) * 100)
+          : 0;
+
+        const score = calculateImpactScore(remittanceCount, Math.min(avgAllocation, 30));
+        setImpactScore(score);
+        setAvgAllocationPercent(Math.min(avgAllocation, 30));
+      }
+    } catch (err) {
+      console.error('Impact score calculation error:', err);
     }
   };
 
@@ -709,3 +779,279 @@ export default function Dashboard() {
                         Detected from keywords
                       </p>
                     </div>
+                  ))}
+                </div>
+                {suggestionText && (
+                  <div className="mt-4 p-3 bg-gradient-to-r from-indigo-50 to-emerald-50 border border-indigo-200 rounded-lg">
+                    <p className="text-xs font-semibold text-indigo-900 mb-1 flex items-center gap-1"><FiTarget className="w-3 h-3" /> Suggestion</p>
+                    <p className="text-xs text-indigo-800 leading-relaxed">{suggestionText}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Recommended Vaults Card */}
+            {recommended.length > 0 && (
+              <div className="bg-white rounded-xl shadow-md p-6 animate-fade-in-up">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><FiTrendingUp className="w-5 h-5" /> Recommended Vaults</h2>
+                <div className="space-y-3">
+                  {recommended.map((v) => (
+                    <div key={v.id} className="border border-gray-200 rounded-lg p-3 hover:border-indigo-400 transition">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-gray-900 truncate">{v.type}</div>
+                          <div className="text-xs text-gray-600 line-clamp-2">{v.description}</div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleAllocate(v)}
+                        className="w-full mt-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-1"
+                      >
+                        <FiTarget className="w-3 h-3" /> Allocate
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* FEATURE 5: Impact Score Card */}
+            <ImpactScore
+              score={impactScore}
+              totalRemittances={allocationHistory.length}
+              avgAllocationPercent={avgAllocationPercent}
+              countryFocus={diasporaLocation === 'Other' ? 'Bangladesh' : 'Bangladesh'}
+            />
+          </div>
+
+          {/* Right Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Remittance Card */}
+            <div className="bg-white rounded-xl shadow-md p-6 animate-fade-in-up">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <h2 className="text-xl font-bold">Send Remittance</h2>
+                <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 px-3 py-1 rounded-full text-xs font-semibold text-purple-700 border border-purple-200 whitespace-nowrap">
+                  <FiLock className="w-3 h-3" /> ML-KEM-768
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mb-4">Quantum-resistant encryption protects your data</p>
+
+              {/* FEATURE 2: Fraud Warning */}
+              <FraudWarning
+                amount={parseFloat(remitAmount) || 0}
+                message={remitRecipient}
+                riskLevel={fraudRiskLevel}
+              />
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount (BDT)
+                  </label>
+                  <input
+                    type="number"
+                    value={remitAmount}
+                    onChange={(e) => setRemitAmount(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm"
+                    placeholder="5000"
+                    aria-label="Remittance amount in BDT"
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Recipient Name
+                  </label>
+                  <input
+                    type="text"
+                    value={remitRecipient}
+                    onChange={(e) => setRemitRecipient(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm"
+                    placeholder="Family member name"
+                    aria-label="Recipient name"
+                  />
+                </div>
+
+                {/* FEATURE 3: Remittance Schedule */}
+                <RemittanceSchedule selected={selectedSchedule} onChange={setSelectedSchedule} />
+
+                {recommended.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <FiTarget className="w-4 h-4" /> Allocate to Impact Vault
+                    </label>
+                    {selectedVaultForAllocation ? (
+                      <div className="bg-gradient-to-r from-indigo-50 to-emerald-50 border-2 border-indigo-300 rounded-lg p-4 mb-4">
+                        <div className="flex justify-between items-start gap-3 mb-4">
+                          <div>
+                            <p className="font-bold text-gray-900 capitalize">{selectedVaultForAllocation.type} Vault</p>
+                            <p className="text-xs text-gray-600 mt-1">{selectedVaultForAllocation.description}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedVaultForAllocation(null);
+                              setAllocationPercent(0);
+                            }}
+                            className="text-indigo-600 hover:text-indigo-700 font-bold text-lg flex items-center justify-center"
+                          >
+                            <FiX className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div className="mb-3">
+                          <label className="block text-xs font-semibold text-gray-700 mb-2">
+                            Allocation Percentage: <span className="text-indigo-600">{allocationPercent}%</span>
+                          </label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="30"
+                            value={allocationPercent}
+                            onChange={(e) => setAllocationPercent(parseInt(e.target.value))}
+                            className="w-full cursor-pointer accent-indigo-600"
+                            aria-label="Impact allocation percentage"
+                          />
+                        </div>
+                        {remitAmount && allocationPercent > 0 && (
+                          <div className="bg-white rounded p-3 border border-indigo-200">
+                            <div className="text-xs text-gray-600 mb-2">Calculated Allocation:</div>
+                            <div className="text-lg font-bold text-green-600">
+                              {Math.round((parseFloat(remitAmount) * allocationPercent) / 100)} BDT
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {allocationPercent}% of {remitAmount} BDT
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {recommended.map((vault) => (
+                          <button
+                            key={vault.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVaultForAllocation(vault);
+                              setAllocationPercent(10);
+                            }}
+                            className="px-3 py-2 border-2 border-gray-200 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition text-left"
+                          >
+                            <div className="text-xs font-semibold text-gray-900 truncate capitalize">{vault.type}</div>
+                            <div className="text-xs text-gray-600 truncate">Select vault</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleRemit}
+                  disabled={remitting}
+                  className="w-full py-3 bg-gradient-to-r from-indigo-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+                  aria-busy={remitting}
+                >
+                  {remitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <FiSend className="w-5 h-5" />
+                      Send Quantum-Safe Remittance
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Impact Vaults Card */}
+            <div className="bg-white rounded-xl shadow-md p-6 animate-fade-in-up">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><FiHeart className="w-5 h-5" /> Your Impact Vaults</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {vaults.map((vault) => (
+                  <div key={vault.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-indigo-400 transition">
+                    <div className="flex justify-center mb-2">
+                      {getVaultIcon(vault.type)}
+                    </div>
+                    <h3 className="font-bold capitalize text-sm mb-2 text-gray-900 text-center">{vault.type}</h3>
+                    <p className="text-gray-600 text-xs mb-3 line-clamp-2 text-center">{vault.description}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleAllocate(vault)}
+                      className="w-full px-3 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition text-xs font-semibold"
+                    >
+                      Allocate Funds
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Impact Traceability Card - FEATURE 1 */}
+            <ImpactTraceability records={allocationHistory} isLoading={loadingAllocationHistory} />
+
+            {/* Impact Tracking - Scrollable List */}
+            <div className="bg-white rounded-xl shadow-md p-6 animate-fade-in-up">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><FiBarChart2 className="w-5 h-5" /> Impact History</h2>
+              {loadingAllocationHistory ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+                  <p className="text-gray-600 text-sm">Loading history...</p>
+                </div>
+              ) : allocationHistory.length > 0 ? (
+                <div className="bg-gray-50 rounded-lg p-0 max-h-96 overflow-y-auto border border-gray-200">
+                  <div className="divide-y">
+                    {allocationHistory.map((record) => (
+                      <div key={record.id} className="p-4 hover:bg-indigo-50 transition">
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold capitalize text-gray-900 text-sm truncate">
+                              {record.vault_type} Vault
+                            </h3>
+                            <p className="text-xs text-gray-600 mt-1">
+                              {record.impact_text}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {new Date(record.created_at).toLocaleDateString()} • {new Date(record.created_at).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <div className="text-right whitespace-nowrap">
+                            {record.amount > 0 && (
+                              <div className="font-semibold text-green-600 text-sm">
+                                {record.amount} BDT
+                              </div>
+                            )}
+                            {record.allocation_percent > 0 && (
+                              <div className="text-xs text-green-600 mt-1">
+                                {record.allocation_percent}%
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-indigo-50 to-emerald-50 rounded-lg p-8 text-center border-2 border-dashed border-indigo-200">
+                  <div className="flex justify-center mb-2"><FiBarChart2 className="w-8 h-8 text-indigo-400" /></div>
+                  <p className="text-gray-600 text-sm">No allocations yet</p>
+                  <p className="text-gray-500 text-xs mt-2">Analyze your message and allocate to vaults to track impact!</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy Footer */}
+        <div className="mt-12 text-center text-xs text-gray-500 border-t pt-6 pb-4">
+          <p>🔒 Your data is encrypted and private. Powered by quantum-safe ML-KEM-768 encryption.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
