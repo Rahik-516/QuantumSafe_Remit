@@ -1,6 +1,6 @@
 'use client';
 
-import { FiX, FiCheckCircle, FiAlertCircle, FiAlertTriangle, FiInfo } from 'react-icons/fi';
+import { FiX, FiCheckCircle, FiAlertTriangle, FiInfo } from 'react-icons/fi';
 
 interface AlertProps {
   type: 'error' | 'success' | 'warning' | 'info';
