@@ -166,7 +166,7 @@ export default function SignUp() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Email Sent!</h2>
               <p className="text-gray-600 mb-4">
-                We've sent a verification email to <strong>{registeredEmail}</strong>. Please check your inbox and confirm your email address to activate your account.
+                We&aposve sent a verification email to <strong>{registeredEmail}</strong>. Please check your inbox and confirm your email address to activate your account.
               </p>
               <p className="text-sm text-gray-500 mb-6">Redirecting to login in a few seconds...</p>
               <button
