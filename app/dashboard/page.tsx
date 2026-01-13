@@ -272,46 +272,7 @@ const loadAllocationHistory = useCallback(async (userId: string) => {
     }
   };
 
-  const loadAllocationHistory = async (userId: string) => {
-    try {
-      setLoadingAllocationHistory(true);
-      const { data, error } = await supabase
-        .from('remittance_history')
-        .select('*')
-        .eq('user_id', userId)
-        .filter('recipient', 'like', 'vault:%')
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Error loading allocation history:', error);
-        setAllocationHistory([]);
-        return;
-      }
-
-      if (data) {
-        const records: AllocationRecord[] = data.map((item: any) => ({
-          id: item.id,
-          vault_type: item.recipient.replace('vault:', ''),
-          amount: item.amount || 0,
-          allocation_percent: item.amount ? Math.floor(Math.random() * 30) : 0,
-          impact_text: `Allocated to ${item.recipient.replace('vault:', '')} vault`,
-          created_at: item.created_at,
-          project_name: getMockProjectName(item.recipient.replace('vault:', '')),
-        }));
-        setAllocationHistory(records);
-      }
-    } catch (err) {
-      console.error('Allocation history load error:', err);
-      setAllocationHistory([]);
-    } finally {
-      setLoadingAllocationHistory(false);
-    }
-
-    // Calculate impact score
-    calculateAndUpdateImpactScore(userId);
-  };
-
+  
   const calculateAndUpdateImpactScore = async (userId: string) => {
     try {
       // Fetch all remittances for this user
