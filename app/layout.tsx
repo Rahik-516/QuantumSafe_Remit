@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import ClientLayout from './ClientLayout';
+import ClientLayout from './ClientLayout.tsx';
 
 export const metadata: Metadata = {
   title: 'QuantumSafe — Secure Remittance',

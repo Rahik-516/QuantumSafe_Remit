@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import { FiLock, FiMenu, FiX, FiHome, FiLogIn, FiUserPlus, FiShield, FiUser, FiLogOut, FiChevronDown, FiZap } from 'react-icons/fi';
