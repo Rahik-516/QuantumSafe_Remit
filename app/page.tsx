@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform, cubicBezier } from 'framer-motion';
 import { FiDollarSign, FiAlertTriangle, FiLock, FiCpu, FiGlobe, FiSend, FiEdit, FiMessageCircle, FiStar, FiShield, FiCheckCircle, FiZap, FiClock, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
