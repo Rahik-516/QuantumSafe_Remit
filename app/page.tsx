@@ -1135,7 +1135,7 @@ export default function Home() {
 
         {/* FAQ Bottom CTA */}
         <div className="mt-12 text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-          <p className="text-gray-600 mb-6">Still have questions? We're here to help.</p>
+          <p className="text-gray-600 mb-6">Still have questions? We&aposre here to help.</p>
           <Link
             href="/signup"
             className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition transform duration-300"
