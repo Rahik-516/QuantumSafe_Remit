@@ -142,7 +142,7 @@ export default function Dashboard() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, loadAllocationHistory]);
 
   // FEATURE 2: Detect fraud risk when amount or recipient changes
   useEffect(() => {
