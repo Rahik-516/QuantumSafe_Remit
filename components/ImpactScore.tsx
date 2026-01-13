@@ -116,8 +116,8 @@ export function ImpactScore({
         <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-200">
           <p className="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2"><FiSend className="w-4 h-4" /> Your Impact in {countryFocus}</p>
           <p className="text-sm text-amber-800 leading-relaxed">
-            You've supported education and healthcare initiatives reaching hundreds of families.
-            Through {totalRemittances} smart remittances, you're building sustainable futures in {countryFocus}.
+            You&aposve supported education and healthcare initiatives reaching hundreds of families.
+            Through {totalRemittances} smart remittances, you&aposre building sustainable futures in {countryFocus}.
           </p>
         </div>
 
