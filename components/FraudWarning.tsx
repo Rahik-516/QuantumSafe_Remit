@@ -69,7 +69,7 @@ export function FraudWarning({ amount, message, riskLevel, onDismiss }: FraudWar
           ) && <p>• Suspicious keywords detected in message</p>}
         </div>
         <p className="text-xs mt-2 opacity-70">
-          ✓ This is just a warning. You can still proceed if you're confident about this transaction.
+          ✓ This is just a warning. You can still proceed if you&aposre confident about this transaction.
         </p>
       </div>
       {onDismiss && (
