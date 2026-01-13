@@ -273,35 +273,7 @@ const loadAllocationHistory = useCallback(async (userId: string) => {
   };
 
   
-  const calculateAndUpdateImpactScore = async (userId: string) => {
-    try {
-      // Fetch all remittances for this user
-      const { data, error } = await supabase
-        .from('remittance_history')
-        .select('*')
-        .eq('user_id', userId)
-        .limit(100);
 
-      if (error) {
-        console.error('Error loading remittances for impact score:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const remittanceCount = data.length;
-        const allocatedAmounts = data.filter((r: any) => r.amount > 0).map((r: any) => r.amount);
-        const avgAllocation = allocatedAmounts.length > 0
-          ? Math.round((allocatedAmounts.reduce((a: number, b: number) => a + b, 0) / allocatedAmounts.length / 10000) * 100)
-          : 0;
-
-        const score = calculateImpactScore(remittanceCount, Math.min(avgAllocation, 30));
-        setImpactScore(score);
-        setAvgAllocationPercent(Math.min(avgAllocation, 30));
-      }
-    } catch (err) {
-      console.error('Impact score calculation error:', err);
-    }
-  };
 
   // compute recommendations based on emotions -> vault mapping with location awareness
   const computeRecommendations = (emotions: UserProfile['emotions']) => {
